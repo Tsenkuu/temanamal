@@ -1,0 +1,107 @@
+/*
+ * Custom CSS for Lazismu Tulungagung
+ * Theme: Orange
+ */
+
+:root {
+  --lazismu-orange: #f39200; /* Warna oranye utama dari logo */
+  --lazismu-orange-dark: #d67d00; /* Warna oranye lebih gelap untuk hover */
+  --lazismu-gray: #343a40; /* Warna teks utama */
+}
+
+/* --- Global Overrides & Helpers --- */
+
+body {
+  font-family: "Inter", sans-serif;
+}
+
+.bg-lazismu-orange {
+  background-color: var(--lazismu-orange) !important;
+}
+
+.text-lazismu-orange {
+  color: var(--lazismu-orange) !important;
+}
+
+/* --- Tombol Kustom --- */
+.btn-lazismu {
+  background-color: var(--lazismu-orange);
+  border-color: var(--lazismu-orange);
+  color: #fff;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.btn-lazismu:hover,
+.btn-lazismu:focus {
+  background-color: var(--lazismu-orange-dark);
+  border-color: var(--lazismu-orange-dark);
+  color: #fff;
+}
+
+/* Mengganti warna primary default Bootstrap */
+.btn-primary {
+  background-color: var(--lazismu-orange);
+  border-color: var(--lazismu-orange);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--lazismu-orange-dark);
+  border-color: var(--lazismu-orange-dark);
+}
+
+/* --- Komponen Lainnya --- */
+
+/* Progress Bar */
+.progress-bar {
+  background-color: var(--lazismu-orange);
+}
+
+/* Paginasi */
+.pagination .page-item.active .page-link {
+  background-color: var(--lazismu-orange);
+  border-color: var(--lazismu-orange);
+  color: #fff;
+}
+
+.pagination .page-link {
+  color: var(--lazismu-orange);
+}
+
+.pagination .page-link:hover {
+  color: var(--lazismu-orange-dark);
+}
+
+/* Navbar */
+.navbar-light .navbar-brand {
+  font-weight: bold;
+}
+
+.navbar .btn-lazismu {
+  border-radius: 50rem; /* Membuat tombol lebih oval */
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* Card Program */
+.card-program .card-title {
+  font-weight: 600;
+  color: var(--lazismu-gray);
+}
+
+.card-program .card-img-top {
+  transition: transform 0.3s ease;
+}
+
+.card-program:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+/* Footer */
+.footer {
+  background-color: #f8f9fa;
+  padding: 2rem 0;
+  margin-top: 3rem;
+  border-top: 1px solid #e9ecef;
+}

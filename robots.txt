@@ -1,0 +1,7 @@
+Izinkan semua agen (bot pencari) untuk merayapi seluruh situs
+User-agent: *
+Allow: /
+
+Beri tahu lokasi peta situs (sitemap) Anda
+Ganti "https://temanamal.org" dengan domain Anda yang sebenarnya
+Sitemap: https://www.google.com/search?q=https://temanamal.org/sitemap.php

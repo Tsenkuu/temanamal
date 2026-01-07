@@ -1,0 +1,51 @@
+# Aktifkan Rewrite Engine
+RewriteEngine On
+RewriteBase /
+
+# === Aturan untuk URL Bersih (tanpa .php) ===
+RewriteRule ^beranda$ index.php [L]
+RewriteRule ^program$ program.php [L]
+RewriteRule ^majalah$ majalah.php [L]
+RewriteRule ^berita$ berita.php [L]
+RewriteRule ^search$ search.php [L]
+RewriteRule ^laporan$ laporan.php [L]
+RewriteRule ^donasi$ donasi.php [L]
+RewriteRule ^login$ login.php [L]
+RewriteRule ^registrasi$ register.php [L]
+RewriteRule ^tentang_kami$ tentang_kami.php [L]
+RewriteRule ^personalia$ personalia.php [L]
+RewriteRule ^kalkulator_zakat$ kalkulator_zakat.php [L]
+
+# === Aturan untuk Laporan dengan parameter ===
+# /laporan/jenis/2025-09 → /laporan.php?jenis=jenis&period=2025-09-01
+RewriteRule ^laporan/([A-Za-z]+)/([0-9]{4}-[0-9]{2})/?$ laporan.php?jenis=$1&periode=$2-01 [L,QSA]
+
+# === Aturan untuk URL Detail dengan SLUG ===
+# Halaman detail program: /program/slug
+RewriteRule ^program/([a-zA-Z0-9-]+)/?$ detail_program.php?id=$1 [L,QSA]
+
+# Halaman detail berita: /berita/slug
+RewriteRule ^berita/([a-zA-Z0-9-]+)/?$ detail_berita.php?slug=$1 [L,QSA]
+# Halaman detail majalah: /majalah/id
+RewriteRule ^majalah/([0-9]+)/?$ detail_majalah.php?id=$1 [L,QSA]
+
+
+
+# ====================================================
+
+# --- Konfigurasi Halaman Error Kustom ---
+ErrorDocument 403 /error.php?code=403
+ErrorDocument 404 /error.php?code=404
+ErrorDocument 500 /error.php?code=500
+
+# --- Default handler agar request diarahkan ke index.php ---
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php81” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php81 .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
