@@ -16,7 +16,7 @@ $tahun_terpilih = isset($_GET['tahun']) ? $_GET['tahun'] : date('Y');
 
 // --- Query untuk mengambil data riwayat berdasarkan filter ---
 $sql = "SELECT 
-            d.id, d.invoice_id, d.nama_donatur, d.nominal, d.status, d.created_at, d.bukti_pembayaran,
+            d.id, d.invoice_id, d.nama_donatur, d.nominal,d.kontak_donatur, d.status, d.created_at, d.bukti_pembayaran,
             p.nama_program
         FROM donasi d
         LEFT JOIN program p ON d.id_program = p.id
@@ -93,12 +93,14 @@ require_once 'templates/header_admin.php';
                             <td class="w-4 p-4"><input type="checkbox" name="donasi_ids[]"
                                     value="<?php echo $donasi['id']; ?>" class="pilih-item"></td>
                             <td class="px-6 py-4">
-                                <p class="font-semibold text-dark-text">
-                                    <?php echo htmlspecialchars($donasi['nama_donatur']); ?></p>
-                                <p class="text-xs">
-                                    <?php echo htmlspecialchars($donasi['nama_program'] ?: 'Donasi Umum'); ?> |
-                                    <?php echo date('d M Y, H:i', strtotime($donasi['created_at'])); ?></p>
-                            </td>
+    <p class="font-semibold text-dark-text">
+        <?php echo htmlspecialchars($donasi['nama_donatur']); ?></p>
+    <p class="text-sm text-gray-600">
+        <?php echo htmlspecialchars($donasi['kontak_donatur']); ?></p>
+    <p class="text-xs mt-1">
+        <?php echo htmlspecialchars($donasi['nama_program'] ?: 'Donasi Umum'); ?> |
+        <?php echo date('d M Y, H:i', strtotime($donasi['created_at'])); ?></p>
+</td>
                             <td class="px-6 py-4 text-right font-semibold text-green-600">Rp
                                 <?php echo number_format($donasi['nominal'], 0, ',', '.'); ?></td>
                             <td class="px-6 py-4 text-center">

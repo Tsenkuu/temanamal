@@ -47,11 +47,18 @@ require_once 'templates/header_admin.php';
 
 <main class="main-content">
     <!-- Header Halaman -->
-    <div class="header-welcome">
+<div class="flex flex-wrap justify-between items-center gap-4">
+    <div>
         <h1 class="text-2xl md:text-3xl font-bold text-dark-text">Selamat Datang,
             <?php echo htmlspecialchars($admin_nama); ?>!</h1>
         <p class="text-gray-500 mt-1">Berikut adalah ringkasan aktivitas di Lazismu Tulungagung hari ini.</p>
     </div>
+    <div>
+        <a href="export_users.php" class="btn-secondary">
+            <i class="bi bi-download mr-2"></i>Export User (Admin & Amil)
+        </a>
+    </div>
+</div>
 
     <!-- Kartu Statistik Utama -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
