@@ -16,9 +16,9 @@ if (session_status() === PHP_SESSION_NONE) {
 $isLocal = in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1']);
 
 define('DB_SERVER',   'localhost');
-define('DB_USERNAME', $isLocal ? 'root' : 'fzqcqgbi_data'); // Username lokal vs server
-define('DB_PASSWORD', $isLocal ? '' : 'pyp@123rawy');       // Password lokal vs server
-define('DB_NAME',     $isLocal ? 'lazismu2' : 'fzqcqgbi_cb');   // Nama database lokal vs server
+define('DB_USERNAME', $isLocal ? 'root' : 'root'); // Username lokal vs server
+define('DB_PASSWORD', $isLocal ? '' : '');       // Password lokal vs server
+define('DB_NAME',     $isLocal ? 'lazismu2' : 'lazismu2');   // Nama database lokal vs server
 
 // --- KONEKSI DATABASE ---
 // Menggunakan error handling dengan try-catch untuk mysqli
@@ -57,10 +57,9 @@ $admin_wa_number_from_db = $result_wa && $result_wa->num_rows > 0
     : '6285806917113'; // Nomor default jika query gagal
 
 define('ADMIN_WA_NUMBER', $admin_wa_number_from_db);
-define('API_WA_BASE_URL', 'http://192.168.1.6:8731'); // Base URL server Node.js
-define('API_WA_URL',      'http://192.168.1.6:8731/kirim-pesan');
-define('API_KALKULATOR_URL','http://192.168.1.6:8731/kalkulator-details');
-define('API_WA_RESET_URL',  'http://192.168.1.6:8731/reset-sesi');
+// Local wa-api service (default). Sesuaikan jika Anda menjalankan di host/port lain.
+define('API_WA_BASE_URL', 'http://127.0.0.1:3001'); // Base URL server Node.js (wa-api)
+// Pastikan nilai token ini sama dengan `API_WA_TOKEN` di file .env pada folder wa-api
 define('API_WA_TOKEN',      'RAHASIAPIXELYOGA');
 
 /**
@@ -75,6 +74,11 @@ function callWhatsappAPI($endpoint, $method = 'POST', $data = []) {
     $data['token'] = API_WA_TOKEN;
 
     $url = API_WA_BASE_URL . $endpoint;
+    // Jika metode GET, tambahkan parameter query dari $data (termasuk token)
+    if (strtoupper($method) === 'GET' && !empty($data)) {
+        $query = http_build_query($data);
+        $url .= (strpos($url, '?') === false ? '?' : '&') . $query;
+    }
     $ch = curl_init($url);
 
     $options = [
@@ -83,7 +87,7 @@ function callWhatsappAPI($endpoint, $method = 'POST', $data = []) {
         CURLOPT_CONNECTTIMEOUT => 5,  // Waktu tunggu koneksi
     ];
 
-    if ($method === 'POST') {
+    if (strtoupper($method) === 'POST') {
         $options[CURLOPT_POST] = true;
         $options[CURLOPT_POSTFIELDS] = json_encode($data);
         $options[CURLOPT_HTTPHEADER] = ['Content-Type: application/json'];

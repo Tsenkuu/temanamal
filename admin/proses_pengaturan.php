@@ -26,24 +26,35 @@ if (isset($_POST['simpan_umum'])) {
 
 // Proses reset bot
 if (isset($_POST['reset_bot'])) {
-    // URL ke endpoint reset di server bot Node.js Anda
-    $reset_url = str_replace('kirim-pesan', 'reset-sesi', API_WA_URL);
-    
-    $data = ['token' => API_WA_TOKEN];
+    // Panggil endpoint /reset menggunakan fungsi helper
+    $response = callWhatsappAPI('/reset', 'POST');
 
-    $ch = curl_init($reset_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-    $response = curl_exec($ch);
-    curl_close($ch);
+    if ($response && $response['success']) {
+        // Setelah reset berhasil, coba polling /qr beberapa detik untuk mendapatkan QR langsung
+        $qr_found = false;
+        $qr_data = null;
+        // Polling selama 15 detik
+        for ($i = 0; $i < 30; $i++) { 
+            usleep(500000); // 0.5s
+            $qr_response = callWhatsappAPI('/qr', 'GET');
+            if (isset($qr_response['success']) && $qr_response['success'] && !empty($qr_response['data']['qr'])) {
+                $qr_found = true;
+                $qr_data = $qr_response['data']['qr'];
+                break;
+            }
+        }
 
-    $responseData = json_decode($response, true);
-    if ($responseData && $responseData['success']) {
-        $_SESSION['success_message'] = "Sesi bot berhasil direset. Silakan jalankan ulang aplikasi bot Anda dan pindai QR code baru.";
+        $_SESSION['success_message'] = "Sesi bot berhasil direset.";
+        if ($qr_found) {
+            // QR data sudah dalam format data URL, tidak perlu disimpan di session
+            // Halaman pengaturan akan mengambilnya via AJAX
+            $_SESSION['success_message'] .= " Memuat QR baru...";
+        } else {
+            $_SESSION['success_message'] .= " Gagal memuat QR secara otomatis. Coba segarkan halaman.";
+        }
     } else {
-        $_SESSION['error_message'] = "Gagal mereset sesi bot. Pastikan aplikasi bot sedang berjalan.";
+        $error_msg = $response['message'] ?? 'Pastikan aplikasi bot sedang berjalan.';
+        $_SESSION['error_message'] = "Gagal mereset sesi bot. " . $error_msg;
     }
     header("Location: pengaturan.php");
     exit();

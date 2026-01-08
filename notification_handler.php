@@ -46,26 +46,45 @@ try {
     $stmt_update_donasi->execute();
     $stmt_update_donasi->close();
 
-    // 2. Jika pembayaran berhasil, update nominal terkumpul di tabel 'program'
+    // 2. Jika pembayaran berhasil, update nominal terkumpul dan kirim notifikasi
     if ($status_to_update == 'Selesai') {
-        // Ambil detail donasi (nominal dan id_program) dari database
-        $stmt_get_donasi = $mysqli->prepare("SELECT nominal, id_program FROM donasi WHERE invoice_id = ?");
+        // Ambil detail donasi (nama, nominal, id_program) dari database
+        $stmt_get_donasi = $mysqli->prepare(
+            "SELECT d.nama_donatur, d.nominal, d.id_program, p.nama_program 
+             FROM donasi d 
+             LEFT JOIN program p ON d.id_program = p.id 
+             WHERE d.invoice_id = ?"
+        );
         $stmt_get_donasi->bind_param("s", $order_id);
         $stmt_get_donasi->execute();
         $result_donasi = $stmt_get_donasi->get_result();
         
         if ($result_donasi->num_rows > 0) {
             $donasi = $result_donasi->fetch_assoc();
+            $nama_donatur = $donasi['nama_donatur'];
             $nominal_donasi = $donasi['nominal'];
             $id_program_donasi = $donasi['id_program'];
+            $nama_program = $donasi['nama_program'] ?? 'Donasi Umum'; // Default jika tidak ada program spesifik
 
-            // Jika donasi ini ditujukan untuk program spesifik (id_program tidak null)
+            // Jika donasi ini ditujukan untuk program spesifik
             if ($id_program_donasi !== NULL) {
-                // Update kolom 'donasi_terkumpul' di tabel 'program'
                 $stmt_update_program = $mysqli->prepare("UPDATE program SET donasi_terkumpul = donasi_terkumpul + ? WHERE id = ?");
                 $stmt_update_program->bind_param("di", $nominal_donasi, $id_program_donasi);
                 $stmt_update_program->execute();
                 $stmt_update_program->close();
+            }
+
+            // Kirim notifikasi WhatsApp ke Admin
+            // Pastikan ADMIN_WA_NUMBER sudah didefinisikan di config.php
+            if (defined('ADMIN_WA_NUMBER') && function_exists('kirimNotifikasiWA')) {
+                $nominal_formatted = "Rp " . number_format($nominal_donasi, 0, ',', '.');
+                $pesan = "Notifikasi Donasi Terkonfirmasi (Midtrans)\n\n" .
+                         "Donasi sebesar *{$nominal_formatted}* dari *{$nama_donatur}* untuk program '{$nama_program}' telah berhasil.\n\n" .
+                         "Invoice: {$order_id}\n" .
+                         "Status: Selesai\n\n" .
+                         "Tidak perlu konfirmasi manual. Terima kasih.";
+                
+                kirimNotifikasiWA(ADMIN_WA_NUMBER, $pesan);
             }
         }
         $stmt_get_donasi->close();
